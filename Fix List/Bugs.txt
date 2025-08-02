@@ -1,0 +1,20 @@
+Commish 
+Check In. Level Up. Stay on Track. 
+If there are no properties in the listing, Analytics should be reset to 0 for everything.  
+** FIXED ** Data should be private and protected from each user. 
+User can not import data but Admin can. 
+
+Admin cant delete data - but can import and over ride. Users need to be able to delete their own data. 
+If there is no data in the properties list have a pop up to ask user to create a CSV file from 
+
+AgentBox and then import it into Commish. 
+Change Listed button to Convert to Listing! 
+In Listing Page, when the property is marked as sold it is moved to Sold Properties 
+Listings page, change the format to match the Properties Page. 
+Remove Recent Properties from Analytics 
+On Analytics we need to see a pie chart of where the bulk of the expenses are going. 
+
+Reports Page that can print a PDF with all properties sold in fin year and report in total, what com, what date, what address, percentage, running total. 
+
+Expenses report
+
