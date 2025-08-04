@@ -23,12 +23,15 @@ def send_push():
             "error": "Missing 'token' or 'phone_number' in request body"
         }), 400
 
+    title = data.get("title", "📞 Incoming Lead")
+    body = data.get("body", f"Click to call {phone_number}")
+
     try:
         message = messaging.Message(
             token=fcm_token,
             notification=messaging.Notification(
-                title="📞 Incoming Lead",
-                body=f"Click to call {phone_number}"
+                title=title,
+                body=body
             ),
             data={
                 "phone_number": phone_number
