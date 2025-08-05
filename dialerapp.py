@@ -3,6 +3,10 @@ import firebase_admin
 from firebase_admin import credentials, messaging
 import os
 
+@app.route("/version", methods=["GET"])
+def version():
+    return "DialerApp v2 – custom title/body enabled", 200
+
 app = Flask(__name__)
 
 # initialise Firebase only once
