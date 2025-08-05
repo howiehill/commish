@@ -15,7 +15,7 @@ except ValueError:
 
 @app.route("/call", methods=["POST"])
 def send_call_notification():
-    data = request.get_json()
+    data = request.get_json(force=True)
     print("🧪 Raw data payload received:", data)
 
     token = data.get("token")
@@ -23,12 +23,12 @@ def send_call_notification():
     title = data.get("title", f"Call {phone_number}")
     body = data.get("body", f"Tap to call {phone_number}")
 
-    print(f"✉️ Title: {title}, Body: {body}")
+    print(f"✉️ Title: {title} | Body: {body}")
 
     if not token or not phone_number:
         return jsonify({"error": "Missing token or phone number"}), 400
 
-    message = messaging.Message(
+    msg = messaging.Message(
         token=token,
         notification=messaging.Notification(
             title=title,
@@ -42,15 +42,28 @@ def send_call_notification():
         ),
         apns=messaging.APNSConfig(
             headers={"apns-priority": "10"},
+            payload=messaging.APNSPayload(
+                aps=messaging.Aps(
+                    alert=messaging.ApsAlert(
+                        title=title,
+                        body=body
+                    ),
+                    sound="default"
+                )
+            ),
             fcm_options=messaging.APNSFCMOptions(
                 link=f"tel:{phone_number}"
             )
         ),
-        data={"phone_number": phone_number}
+        data={
+            "phone_number": phone_number,
+            "custom_title": title,
+            "custom_body": body
+        }
     )
 
     try:
-        message_id = messaging.send(message)
+        message_id = messaging.send(msg)
         return jsonify({"status": "sent", "message_id": message_id}), 202
     except Exception as e:
         print("❌ Error sending FCM message:", e)
@@ -58,9 +71,9 @@ def send_call_notification():
 
 @app.route("/save-token", methods=["POST"])
 def save_token():
-    data = request.get_json()
+    data = request.get_json(force=True)
     print("📲 Save token request received:", data)
-    # In production, save token to a database or file here
+    # in production, persist token somewhere
     return jsonify({"status": "saved"}), 200
 
 @app.route("/", methods=["GET"])
