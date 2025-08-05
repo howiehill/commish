@@ -40,6 +40,12 @@ def send_call_notification():
                 click_action="ACTION_CALL"
             )
         ),
+        apns=messaging.APNSConfig(
+            headers={"apns-priority": "10"},
+            fcm_options=messaging.APNSFCMOptions(
+                link=f"tel:{phone_number}"
+            )
+        ),
         data={"phone_number": phone_number}
     )
 
