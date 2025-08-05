@@ -1,11 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import firebase_admin
 from firebase_admin import credentials, messaging
 import os
-
-@app.route("/version", methods=["GET"])
-def version():
-    return "DialerApp v2 – custom title/body enabled", 200
 
 app = Flask(__name__)
 
@@ -77,12 +73,22 @@ def send_call_notification():
 def save_token():
     data = request.get_json(force=True)
     print("📲 Save token request received:", data)
-    # in production, persist token somewhere
     return jsonify({"status": "saved"}), 200
 
 @app.route("/", methods=["GET"])
 def root():
     return "Commish Server is Live ✅", 200
+
+@app.route("/version", methods=["GET"])
+def version():
+    return "DialerApp v2 – custom title/body enabled", 200
+
+@app.route("/source", methods=["GET"])
+def source():
+    # return this file’s source for verification
+    with open(__file__, "r") as f:
+        content = f.read()
+    return Response(content, mimetype="text/plain")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
