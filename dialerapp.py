@@ -18,6 +18,7 @@ def send_call_notification():
     token = data.get("token")
     phone_number = data.get("phone_number")
     title = data.get("title", "Hmmm Boyee")
+    title = data.get("title", "Boyakasha")
     body = data.get("body", f"Click to call {phone_number}")
 
     print(f"✉️ Title: {title} | Body: {body}")  # DEBUG
