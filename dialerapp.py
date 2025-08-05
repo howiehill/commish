@@ -5,54 +5,47 @@ import os
 
 app = Flask(__name__)
 
-# Load Firebase credentials from environment or local path
-cred_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") or "firebase-creds.json"
 if not firebase_admin._apps:
+    cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "firebase-adminsdk.json")
     cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
 
-@app.route('/call', methods=['POST'])
-def send_push():
+@app.route("/call", methods=["POST"])
+def send_call_notification():
     data = request.get_json()
-    fcm_token = data.get("token")
+    print("🧪 Raw data payload received:", data)  # DEBUG
+
+    token = data.get("token")
     phone_number = data.get("phone_number")
-
-    if not fcm_token or not phone_number:
-        return jsonify({
-            "success": False,
-            "error": "Missing 'token' or 'phone_number' in request body"
-        }), 400
-
-    title = data.get("title", "📞 Incoming Lead")
+    title = data.get("title", "📞 Tap to Call")
     body = data.get("body", f"Click to call {phone_number}")
 
-    try:
-        message = messaging.Message(
-            token=fcm_token,
+    print(f"✉️ Title: {title} | Body: {body}")  # DEBUG
+
+    if not token or not phone_number:
+        return jsonify({"error": "Missing token or phone number"}), 400
+
+    result = messaging.send(
+        messaging.Message(
+            token=token,
             notification=messaging.Notification(
                 title=title,
-                body=body
+                body=body,
             ),
-            data={
-                "phone_number": phone_number
-            }
+            data={"phone_number": phone_number},
         )
-        response = messaging.send(message)
-        return jsonify({"success": True, "message_id": response}), 200
+    )
+    return jsonify({"status": "sent", "result": result})
 
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route('/save-token', methods=['POST'])
+@app.route("/save-token", methods=["POST"])
 def save_token():
     data = request.get_json()
-    fcm_token = data.get("token")
+    print("📲 Save token request received:", data)
+    # In production: save token to a DB or file
+    return jsonify({"status": "saved"}), 200
 
-    if not fcm_token:
-        return jsonify({"success": False, "error": "Missing token"}), 400
 
-    print(f"📥 Received FCM token: {fcm_token}")
-    return jsonify({"success": True}), 200
-
-if __name__ == '__main__':
-    app.run(port=5001)
+@app.route("/", methods=["GET"])
+def root():
+    return "Commish Server is Live ✅", 200
